@@ -1,0 +1,123 @@
+package cadad.org.ryanapp;
+
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
+import cadad.org.models.Book;
+import cadad.org.parsers.BookParser;
+
+public class RequestOperation {
+
+    Book respondeBook = new Book();
+
+    public Book getBook() {
+        return this.respondeBook;
+    }
+
+    public void init() {
+        HttpClient client = new DefaultHttpClient();
+        try {
+            List<String> params = new ArrayList();
+            Calendar calendar = Calendar.getInstance();
+            int day_of_month = calendar.get(Calendar.DAY_OF_MONTH);
+            int month = calendar.get(Calendar.MONTH) + 1;
+            int year = calendar.get(Calendar.YEAR);
+            int max_days_of_month = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+            int month_for_search = 1;
+            List<String> fromList = new ArrayList<String>();
+            fromList.add("LPA");
+            List<String> toList = new ArrayList<String>();
+            toList.add("MAD");
+            for (int i = 0; i < toList.size(); i++) {
+                month = calendar.get(Calendar.MONTH);
+                year = calendar.get(Calendar.YEAR);
+                for (int iterator = 0; iterator < month_for_search; iterator++) {
+                    month++;
+                    if (month == 13) {
+                        month = 1;
+                        year++;
+                    }
+                    day_of_month = calendar.get(Calendar.DAY_OF_MONTH);
+                    for (; day_of_month <= max_days_of_month; day_of_month += 7) {
+                        params.clear();
+                        params.add(Constants.ADULT + Constants.EQ + "1");
+                        params.add(Constants.BALEARIC_USER_ANSWER + Constants.EQ + "YES");
+                        params.add(Constants.CHILD + Constants.EQ + "0");
+                        params.add(Constants.INFANT + Constants.EQ + "0");
+                        params.add(Constants.SEARCH_BY + Constants.EQ + "columenView");
+                        params.add(Constants.ACCEPT_TERMS + Constants.EQ + "yes");
+                        params.add(Constants.CULTURE + Constants.EQ + "es");
+                        params.add(Constants.DATE1 + Constants.EQ + year + normalize(month) + normalize(day_of_month));
+                        params.add(Constants.DATE2 + Constants.EQ + year + normalize(month) + normalize((day_of_month)));
+                        params.add(Constants.LANGUAGE + Constants.EQ + "");
+                        params.add(Constants.M1 + Constants.EQ + year + normalize(month) + normalize(day_of_month) + "a" + fromList.get(0) + toList.get(i));
+                        params.add(Constants.M1DO + Constants.EQ + "0");
+                        params.add(Constants.M1DP + Constants.EQ + "0");
+                        params.add(Constants.M2 + Constants.EQ + year + normalize(month) + normalize((day_of_month)) + toList.get(i) + "a" + fromList.get(0));
+                        params.add(Constants.M2DO + Constants.EQ + "0");
+                        params.add(Constants.M2DP + Constants.EQ + "0");
+                        params.add(Constants.MODE + Constants.EQ + "0");
+                        params.add(Constants.MODULE + Constants.EQ + "SB");
+                        params.add(Constants.NOM + Constants.EQ + "2");
+                        params.add(Constants.OP + Constants.EQ + "");
+                        params.add(Constants.PM + Constants.EQ + "0");
+                        params.add(Constants.PT + Constants.EQ + "1ADULT");
+                        params.add(Constants.PAGE + Constants.EQ + "SELECT");
+                        params.add(Constants.RP + Constants.EQ + "");
+                        params.add(Constants.SECTOR1_D + Constants.EQ + toList.get(i));
+                        params.add(Constants.SECTOR1_O + Constants.EQ + fromList.get(0));
+                        params.add(Constants.SECTOR_1_D + Constants.EQ + normalize(day_of_month));
+                        params.add(Constants.SECTOR_1_M + Constants.EQ + normalize(month) + year);
+                        params.add(Constants.SECTOR_2_D + Constants.EQ + normalize((day_of_month)));
+                        params.add(Constants.SECTOR_2_M + Constants.EQ + normalize(month) + year);
+                        params.add(Constants.TC + Constants.EQ + "1");
+                        params.add(Constants.TRAVEL_TYPE + Constants.EQ + "on");
+                        day_of_month++;
+                        String parameters = new String();
+                        Iterator<String> paramsIterator = params.iterator();
+                        while (paramsIterator.hasNext()) {
+                            String object = (String) paramsIterator.next();
+                            parameters += object + "&";
+                        }
+                        parameters = parameters.substring(0, parameters.lastIndexOf("&"));
+                        String url = "http://www.bookryanair.com/SkySales/FRSearchRedirect.aspx?culture=es-es&lc=es-es?";
+                        HttpPost httpPost = new HttpPost(url + parameters);
+                        HttpResponse response = client.execute(httpPost);
+                        String responseBody = EntityUtils.toString(response.getEntity());
+                        HttpGet httpGetAfterResponse = new HttpGet("http://www.bookryanair.com/SkySales/FRSelect.aspx");
+                        HttpResponse responseGet = client.execute(httpGetAfterResponse);
+                        String responseGetBody = EntityUtils.toString(responseGet.getEntity());
+                        System.out.println(responseGetBody);
+                        Book book = new Book();
+                        BookParser bookParser = new BookParser();
+                        book = bookParser.parse(responseGetBody);
+                        respondeBook = book;
+                    }
+                }
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static String normalize(int number) {
+        String item = new String();
+        if (number < 10) {
+            item = "0" + String.valueOf(number);
+        } else {
+            item = String.valueOf(number);
+        }
+        return item;
+    }
+}

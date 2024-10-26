@@ -1,0 +1,336 @@
+package matrixviewer;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import javax.swing.JFileChooser;
+import matrixviewer.model.Matrix;
+import matrixviewer.model.MatrixFactory;
+import matrixviewer.model.Range;
+import matrixviewer.view.MatrixView;
+import org.jdesktop.application.Action;
+
+/**
+ *
+ * @author bchisham
+ */
+public class MatrixViewerDisplay extends javax.swing.JFrame {
+
+    private static String ftype = "csv";
+
+    Matrix matrix;
+
+    private void doPostInit() {
+        this.extractRangeButton.setText("Extract");
+        this.rowRangeLabel.setText("Row Ranage:");
+        this.colRangeLabel.setText("Col Range: ");
+        this.highlightRangeBtn.setText("Highlight");
+        this.fileMenu.setText("File");
+        this.saveMenuItem.setText("Save");
+        this.Open.setText("Open");
+        this.openUrlMenuItem.setText("Open URL");
+        this.closeMenuItem.setText("Close");
+    }
+
+    /** Creates new form MatrixViewerDisplay */
+    public MatrixViewerDisplay() {
+        initComponents();
+        doPostInit();
+    }
+
+    public MatrixViewerDisplay(String urlOrFile) {
+        initComponents();
+        doPostInit();
+        try {
+            URL url = new URL(urlOrFile);
+            openFile(url);
+        } catch (MalformedURLException ex) {
+            File file = new File(urlOrFile);
+            openFile(file);
+        }
+    }
+
+    public MatrixViewerDisplay(File file) {
+        this.initComponents();
+        this.doPostInit();
+        this.setTitle("Matrix Viewer - " + file.getName());
+        this.openFile(file);
+    }
+
+    private MatrixViewerDisplay(String title, Matrix sub_model) {
+        initComponents();
+        this.doPostInit();
+        this.colRangeTxtField.setText("0-" + sub_model.getcolumncount());
+        this.rowRangeTxtField.setText("0-" + sub_model.getrowcount());
+        this.setTitle(title);
+        this.matrix = sub_model;
+        ((MatrixView) this.matrix_display_panel).setMatrix(sub_model);
+        KeyDisplay kd = new KeyDisplay(matrix);
+        kd.setTitle("Color Key = " + this.getTitle());
+        kd.setVisible(true);
+    }
+
+    @Action
+    private void openFile() {
+        this.openFileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
+        this.openFileChooser.setVisible(true);
+        if (this.openFileChooser.getSelectedFile() != null) {
+            this.openFile(this.openFileChooser.getSelectedFile());
+        }
+    }
+
+    @Action
+    private void saveFile() {
+        try {
+            this.openFileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
+            this.openFileChooser.setVisible(true);
+            this.matrix.write(new FileOutputStream(this.openFileChooser.getSelectedFile()));
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MatrixViewerDisplay.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void openFile(URL url) {
+        try {
+            this.matrix = MatrixFactory.getMatrix(ftype);
+            this.matrix.read(url.openStream());
+            this.setTitle("Matrix Data - " + url.toString());
+            this.rowRangeTxtField.setText("0-" + this.matrix.getrowcount());
+            this.colRangeTxtField.setText("0-" + this.matrix.getcolumncount());
+            ((MatrixView) this.matrix_display_panel).setMatrix(matrix);
+            KeyDisplay kd = new KeyDisplay(matrix);
+            kd.setVisible(true);
+            kd.setTitle("Color Key - " + url.toString());
+        } catch (IOException ex) {
+            Logger.getLogger(MatrixViewerDisplay.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void openFile(File file) {
+        try {
+            this.matrix = MatrixFactory.getMatrix(ftype);
+            this.matrix.read(new FileInputStream(file));
+            this.setTitle("Matrix Data - " + file.getName());
+            this.rowRangeTxtField.setText("0," + this.matrix.getrowcount());
+            this.colRangeTxtField.setText("0," + this.matrix.getcolumncount());
+            ((MatrixView) this.matrix_display_panel).setMatrix(matrix);
+            KeyDisplay kd = new KeyDisplay(matrix);
+            kd.setVisible(true);
+            kd.setTitle("Color Key - " + file.getName());
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(MatrixViewerDisplay.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    private void matrixResized() {
+        this.matrixScrollPane.invalidate();
+    }
+
+    /** This method is called from within the constructor to
+     * initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is
+     * always regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    private void initComponents() {
+        openFileChooser = new javax.swing.JFileChooser();
+        titleLabel = new javax.swing.JLabel();
+        rowRangeLabel = new javax.swing.JLabel();
+        colRangeLabel = new javax.swing.JLabel();
+        rowRangeTxtField = new javax.swing.JTextField();
+        colRangeTxtField = new javax.swing.JTextField();
+        extractRangeButton = new javax.swing.JButton();
+        highlightRangeBtn = new javax.swing.JButton();
+        matrixScrollPane = new javax.swing.JScrollPane();
+        matrix_display_panel = new MatrixView();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        mainMenu = new javax.swing.JMenuBar();
+        fileMenu = new javax.swing.JMenu();
+        Open = new javax.swing.JMenuItem();
+        openUrlMenuItem = new javax.swing.JMenuItem();
+        saveMenuItem = new javax.swing.JMenuItem();
+        closeMenuItem = new javax.swing.JMenuItem();
+        openFileChooser.setName("openFileChooser");
+        setName("Form");
+        org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(matrixviewer.MatrixViewerApp.class).getContext().getResourceMap(MatrixViewerDisplay.class);
+        titleLabel.setFont(resourceMap.getFont("titleLabel.font"));
+        titleLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        titleLabel.setText(resourceMap.getString("titleLabel.text"));
+        titleLabel.setName("titleLabel");
+        rowRangeLabel.setLabelFor(rowRangeTxtField);
+        rowRangeLabel.setText(resourceMap.getString("rowRangeLabel.text"));
+        rowRangeLabel.setFocusable(false);
+        rowRangeLabel.setName("rowRangeLabel");
+        colRangeLabel.setLabelFor(colRangeTxtField);
+        colRangeLabel.setText(resourceMap.getString("colRangeLabel.text"));
+        colRangeLabel.setFocusable(false);
+        colRangeLabel.setName("colRangeLabel");
+        rowRangeTxtField.setText(resourceMap.getString("rowRangeTxtField.text"));
+        rowRangeTxtField.setName("rowRangeTxtField");
+        colRangeTxtField.setText(resourceMap.getString("colRangeTxtField.text"));
+        colRangeTxtField.setName("colRangeTxtField");
+        extractRangeButton.setText(resourceMap.getString("extractRangeButton.text"));
+        extractRangeButton.setName("extractRangeButton");
+        extractRangeButton.addActionListener(new java.awt.event.ActionListener() {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                extractRangeButtonActionPerformed(evt);
+            }
+        });
+        highlightRangeBtn.setText(resourceMap.getString("highlightRangeBtn.text"));
+        highlightRangeBtn.setName("highlightRangeBtn");
+        matrixScrollPane.setAutoscrolls(true);
+        matrixScrollPane.setName("matrixScrollPane");
+        matrixScrollPane.setNextFocusableComponent(rowRangeTxtField);
+        matrixScrollPane.addComponentListener(new java.awt.event.ComponentAdapter() {
+
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                matrixScrollPaneComponentResized(evt);
+            }
+        });
+        matrix_display_panel.setName("matrix_display_panel");
+        matrix_display_panel.addComponentListener(new java.awt.event.ComponentAdapter() {
+
+            public void componentResized(java.awt.event.ComponentEvent evt) {
+                matrix_display_panelComponentResized(evt);
+            }
+        });
+        org.jdesktop.layout.GroupLayout matrix_display_panelLayout = new org.jdesktop.layout.GroupLayout(matrix_display_panel);
+        matrix_display_panel.setLayout(matrix_display_panelLayout);
+        matrix_display_panelLayout.setHorizontalGroup(matrix_display_panelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 740, Short.MAX_VALUE));
+        matrix_display_panelLayout.setVerticalGroup(matrix_display_panelLayout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(0, 455, Short.MAX_VALUE));
+        matrixScrollPane.setViewportView(matrix_display_panel);
+        jScrollPane1.setName("jScrollPane1");
+        mainMenu.setName("mainMenu");
+        fileMenu.setText(resourceMap.getString("fileMenu.text"));
+        fileMenu.setName("fileMenu");
+        Open.setText(resourceMap.getString("Open.text"));
+        Open.setName("Open");
+        Open.addActionListener(new java.awt.event.ActionListener() {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                OpenActionPerformed(evt);
+            }
+        });
+        fileMenu.add(Open);
+        openUrlMenuItem.setText(resourceMap.getString("openUrlMenuItem.text"));
+        openUrlMenuItem.setName("openUrlMenuItem");
+        fileMenu.add(openUrlMenuItem);
+        saveMenuItem.setText(resourceMap.getString("saveMenuItem.text"));
+        saveMenuItem.setName("saveMenuItem");
+        saveMenuItem.addActionListener(new java.awt.event.ActionListener() {
+
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveMenuItemActionPerformed(evt);
+            }
+        });
+        fileMenu.add(saveMenuItem);
+        closeMenuItem.setText(resourceMap.getString("closeMenuItem.text"));
+        closeMenuItem.setName("closeMenuItem");
+        fileMenu.add(closeMenuItem);
+        mainMenu.add(fileMenu);
+        setJMenuBar(mainMenu);
+        org.jdesktop.layout.GroupLayout layout = new org.jdesktop.layout.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(layout.createSequentialGroup().addContainerGap().add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(titleLabel, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 945, Short.MAX_VALUE).add(layout.createSequentialGroup().add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(rowRangeLabel).add(extractRangeButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE).add(colRangeLabel)).addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED).add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false).add(highlightRangeBtn, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 94, Short.MAX_VALUE).add(colRangeTxtField).add(rowRangeTxtField)).addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED).add(matrixScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 752, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))).addContainerGap()));
+        layout.setVerticalGroup(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(layout.createSequentialGroup().add(20, 20, 20).add(titleLabel).add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING).add(layout.createSequentialGroup().add(32, 32, 32).add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(rowRangeLabel).add(rowRangeTxtField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED).add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(colRangeLabel).add(colRangeTxtField, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)).addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED).add(layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE).add(extractRangeButton).add(highlightRangeBtn))).add(layout.createSequentialGroup().addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED).add(matrixScrollPane, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 447, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))).addContainerGap()));
+        pack();
+    }
+
+    private void extractRangeButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        this.extractSubmatrixAction();
+    }
+
+    private void matrixScrollPaneComponentResized(java.awt.event.ComponentEvent evt) {
+    }
+
+    private void matrix_display_panelComponentResized(java.awt.event.ComponentEvent evt) {
+        this.matrixResized();
+    }
+
+    private void OpenActionPerformed(java.awt.event.ActionEvent evt) {
+        this.openFile();
+    }
+
+    private void saveMenuItemActionPerformed(java.awt.event.ActionEvent evt) {
+        this.saveFile();
+    }
+
+    /**
+    * @param args the command line arguments
+    */
+    public static void main(String args[]) {
+        if (args.length <= 1) {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+
+                public void run() {
+                    new MatrixViewerDisplay().setVisible(true);
+                }
+            });
+        } else {
+            final String urlarg = args[1];
+            java.awt.EventQueue.invokeLater(new Runnable() {
+
+                public void run() {
+                    new MatrixViewerDisplay(urlarg).setVisible(true);
+                }
+            });
+        }
+    }
+
+    @Action
+    public void extractSubmatrixAction() {
+        System.err.println("Extracting Submatrix");
+        Pattern matcher = Pattern.compile("-");
+        String[] split_row_txt = matcher.split(this.rowRangeTxtField.getText());
+        String[] split_col_txt = matcher.split(this.colRangeTxtField.getText());
+        assert (split_row_txt.length > 1);
+        assert (split_row_txt.length > 1);
+        Range row_range = new Range(Integer.parseInt(split_row_txt[0].trim()), Integer.parseInt(split_row_txt[1].trim()));
+        Range col_range = new Range(Integer.parseInt(split_col_txt[0].trim()), Integer.parseInt(split_col_txt[1].trim()));
+        Matrix sub_model = this.matrix.extractRange(row_range, col_range);
+        MatrixViewerDisplay mvd = new MatrixViewerDisplay(this.getTitle() + ":" + row_range + "x" + col_range, sub_model);
+        mvd.setVisible(true);
+    }
+
+    private javax.swing.JMenuItem Open;
+
+    private javax.swing.JMenuItem closeMenuItem;
+
+    private javax.swing.JLabel colRangeLabel;
+
+    private javax.swing.JTextField colRangeTxtField;
+
+    private javax.swing.JButton extractRangeButton;
+
+    private javax.swing.JMenu fileMenu;
+
+    private javax.swing.JButton highlightRangeBtn;
+
+    private javax.swing.JScrollPane jScrollPane1;
+
+    private javax.swing.JMenuBar mainMenu;
+
+    private javax.swing.JScrollPane matrixScrollPane;
+
+    private javax.swing.JPanel matrix_display_panel;
+
+    private javax.swing.JFileChooser openFileChooser;
+
+    private javax.swing.JMenuItem openUrlMenuItem;
+
+    private javax.swing.JLabel rowRangeLabel;
+
+    private javax.swing.JTextField rowRangeTxtField;
+
+    private javax.swing.JMenuItem saveMenuItem;
+
+    private javax.swing.JLabel titleLabel;
+}
