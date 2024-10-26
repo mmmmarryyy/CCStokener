@@ -1,0 +1,3 @@
+[submodule "ccstokener/BigCloneEval"]
+	path = ccstokener/BigCloneEval
+	url = https://github.com/jeffsvajlenko/BigCloneEval.git
