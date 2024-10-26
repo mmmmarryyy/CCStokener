@@ -1,0 +1,84 @@
+dataset: ./tokens/default
+block num: 2392
+fail by union: 0
+fail by filter: 0
+detect time: 7
+parse time: 1
+-----------------------------
+type1# total: 0, true: 0, recall: -1.00
+type2# total: 0, true: 0, recall: -1.00
+type3# total: 0, true: 0, recall: -1.00
+sim in [1.00, 1.20): total: 16562, detect: 16562, accumulate: 16562
+sim in [0.90, 1.00): total: 561, detect: 561, accumulate: 17123
+sim in [0.80, 0.90): total: 1766, detect: 1766, accumulate: 18889
+sim in [0.70, 0.80): total: 1192, detect: 1192, accumulate: 20081
+sim in [0.60, 0.70): total: 1760, detect: 1760, accumulate: 21841
+sim in [0.50, 0.60): total: 0, detect: 0, accumulate: 21841
+sim in [0.00, 0.50): total: 0, detect: 0, accumulate: 21841
+-----------------------------
+num for sim in (1.00, 1.20]: 16562, 16562
+num for sim in (0.90, 1.00]: 561, 17123
+num for sim in (0.80, 0.90]: 1766, 18889
+num for sim in (0.70, 0.80]: 1192, 20081
+num for sim in (0.60, 0.70]: 1760, 21841
+num for sim in (0.50, 0.60]: 0, 21841
+num for sim in (0.00, 0.50]: 0, 21841
+-----------------------------
+
+
+dataset: ./tokens/selected
+block num: 59487
+fail by union: 0
+fail by filter: 0
+detect time: 754
+parse time: 24
+-----------------------------
+type1# total: 0, true: 0, recall: -1.00
+type2# total: 0, true: 0, recall: -1.00
+type3# total: 0, true: 0, recall: -1.00
+sim in [1.00, 1.20): total: 35216, detect: 35216, accumulate: 35216
+sim in [0.90, 1.00): total: 18932, detect: 18932, accumulate: 54148
+sim in [0.80, 0.90): total: 76145, detect: 76145, accumulate: 130293
+sim in [0.70, 0.80): total: 170623, detect: 170623, accumulate: 300916
+sim in [0.60, 0.70): total: 265259, detect: 265259, accumulate: 566175
+sim in [0.50, 0.60): total: 0, detect: 0, accumulate: 566175
+sim in [0.00, 0.50): total: 0, detect: 0, accumulate: 566175
+-----------------------------
+num for sim in (1.00, 1.20]: 35216, 35216
+num for sim in (0.90, 1.00]: 18932, 54148
+num for sim in (0.80, 0.90]: 76145, 130293
+num for sim in (0.70, 0.80]: 170623, 300916
+num for sim in (0.60, 0.70]: 265259, 566175
+num for sim in (0.50, 0.60]: 0, 566175
+num for sim in (0.00, 0.50]: 0, 566175
+-----------------------------
+
+
+dataset: ./tokens/sample
+block num: 68
+fail by union: 0
+fail by filter: 0
+detect time: 0
+parse time: 0
+-----------------------------
+type1# total: 0, true: 0, recall: -1.00
+type2# total: 0, true: 0, recall: -1.00
+type3# total: 0, true: 0, recall: -1.00
+sim in [1.00, 1.20): total: 8, detect: 8, accumulate: 8
+sim in [0.90, 1.00): total: 19, detect: 19, accumulate: 27
+sim in [0.80, 0.90): total: 19, detect: 19, accumulate: 46
+sim in [0.70, 0.80): total: 24, detect: 24, accumulate: 70
+sim in [0.60, 0.70): total: 6, detect: 6, accumulate: 76
+sim in [0.50, 0.60): total: 0, detect: 0, accumulate: 76
+sim in [0.00, 0.50): total: 0, detect: 0, accumulate: 76
+-----------------------------
+num for sim in (1.00, 1.20]: 8, 8
+num for sim in (0.90, 1.00]: 19, 27
+num for sim in (0.80, 0.90]: 19, 46
+num for sim in (0.70, 0.80]: 24, 70
+num for sim in (0.60, 0.70]: 6, 76
+num for sim in (0.50, 0.60]: 0, 76
+num for sim in (0.00, 0.50]: 0, 76
+-----------------------------
+
+
