@@ -1,0 +1,36 @@
+block num: 3324
+detect time: 0
+parse time: 0
+filtered pair num: 9054
+fail by union: 0
+fail by filter: 0
+----extra info------
+
+
+----------
+-----------------------------
+type1# total: 0, true: 0, recall: -1.00
+type2# total: 0, true: 0, recall: -1.00
+type3# total: 0, true: 0, recall: -1.00
+sim in [1.00, 1.20): total: 10, detect: 10, accumulate: 10
+sim in [0.90, 1.00): total: 25, detect: 25, accumulate: 35
+sim in [0.80, 0.90): total: 43, detect: 43, accumulate: 78
+sim in [0.70, 0.80): total: 37, detect: 37, accumulate: 115
+sim in [0.60, 0.70): total: 63, detect: 63, accumulate: 178
+sim in [0.50, 0.60): total: 0, detect: 0, accumulate: 178
+sim in [0.00, 0.50): total: 0, detect: 0, accumulate: 178
+-----------------------------
+num for sim in (1.00, 1.20]: 10, 10
+save pair to file: ././results-verify/clonepairs/verified-clonepair_1.00_1.20.out
+num for sim in (0.90, 1.00]: 25, 35
+save pair to file: ././results-verify/clonepairs/verified-clonepair_0.90_1.00.out
+num for sim in (0.80, 0.90]: 43, 78
+save pair to file: ././results-verify/clonepairs/verified-clonepair_0.80_0.90.out
+num for sim in (0.70, 0.80]: 37, 115
+save pair to file: ././results-verify/clonepairs/verified-clonepair_0.70_0.80.out
+num for sim in (0.60, 0.70]: 63, 178
+save pair to file: ././results-verify/clonepairs/verified-clonepair_0.60_0.70.out
+num for sim in (0.50, 0.60]: 0, 178
+save pair to file: ././results-verify/clonepairs/verified-clonepair_0.50_0.60.out
+num for sim in (0.00, 0.50]: 0, 178
+save pair to file: ././results-verify/clonepairs/verified-clonepair_0.00_0.50.out

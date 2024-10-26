@@ -1,0 +1,656 @@
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1429788.java", 64, 70
+"/workspaces/CCStokener/ccstokener/tokens-verify/1429788.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1429788.java", 72, 78
+"/workspaces/CCStokener/ccstokener/tokens-verify/1429788.out"
+parsed token num: 14, total token num: 14, pretty line num: 7, other token(common, keyword, const): (12, 2, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1429788.java", 64, 70 */
+public COLLADA load(InputStream inputStream) throws IOException, JAXBException {
+    try {
+        return (COLLADA) jaxbCoder.parse(inputStream, -1);
+    } finally {
+        inputStream.close();
+    }
+}
+----------------------------
+parsed token num: 14, total token num: 14, pretty line num: 7, other token(common, keyword, const): (12, 2, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1429788.java", 72, 78 */
+public NodeType loadNode(final InputStream inputStream) throws IOException, JAXBException {
+    try {
+        return (NodeType) jaxbCoder.parse(inputStream, -1);
+    } finally {
+        inputStream.close();
+    }
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/sample/PrimeFactors.java", 6, 16
+"/workspaces/CCStokener/ccstokener/tokens-verify/PrimeFactors.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/sample/PrimeFactors.java", 18, 28
+"/workspaces/CCStokener/ccstokener/tokens-verify/PrimeFactors.out"
+parsed token num: 33, total token num: 33, pretty line num: 11, other token(common, keyword, const): (30, 3, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/sample/PrimeFactors.java", 6, 16 */
+public static List<Integer> primeFactors1(int number) {
+	int n = number;
+	List<Integer> factors = new ArrayList<Integer>();
+	for (int i = 2; i <= n; i++) {
+		while (n % i == 0) {
+			factors.add(i);
+			n /= i;
+		}
+	}
+	return factors;
+}
+----------------------------
+parsed token num: 33, total token num: 33, pretty line num: 11, other token(common, keyword, const): (30, 3, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/sample/PrimeFactors.java", 18, 28 */
+public static List<Integer> primeFactors2(int number) {
+	int n = number;
+	List<Integer> factors = new ArrayList<Integer>();
+	for (int i = 2; i <= n; i++) {
+		while (n % i == 0) {
+			factors.add(i);
+			n /= i;
+		}
+	}
+	return factors;
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1170415.java", 102, 199
+"/workspaces/CCStokener/ccstokener/tokens-verify/1170415.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1170415.java", 202, 299
+"/workspaces/CCStokener/ccstokener/tokens-verify/1170415.out"
+parsed token num: 335, total token num: 335, pretty line num: 98, other token(common, keyword, const): (290, 45, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1170415.java", 102, 199 */
+public LOCKSSDaemonStatusTableTO getDataFromDaemonStatusTable() throws HttpResponseException {
+    LOCKSSPlatformStatusReader ldstxp = null;
+    LOCKSSPlatformStatusHtmlParser ldsthp = null;
+    LOCKSSDaemonStatusTableTO ldstTO = null;
+    HttpEntity entity = null;
+    HttpGet httpget = null;
+    String headerTimeString = null;
+    try {
+        httpClient.getParams().setParameter("http.connection.timeout", 100000);
+        httpClient.getParams().setParameter("http.socket.timeout", 100000);
+        httpget = new HttpGet(dataUrl);
+        logger.log(Level.INFO, "executing request {0}", httpget.getURI());
+        HttpResponse resp = httpClient.execute(httpget);
+        HeaderElementIterator it = new BasicHeaderElementIterator(resp.headerIterator());
+        while (it.hasNext()) {
+            HeaderElement elem = it.nextElement();
+            logger.log(Level.INFO, "name({0})=value({1})", new Object[] { elem.getName(), elem.getValue() });
+            if (elem.getName().endsWith("GMT")) {
+                headerTimeString = elem.getName();
+            }
+            NameValuePair[] params = elem.getParameters();
+            for (int i = 0; i < params.length; i++) {
+                logger.log(Level.FINE, "parampair:name = {0}", params[i].getName());
+            }
+        }
+        logger.log(Level.INFO, "headerTimeString={0}", headerTimeString);
+        int statusCode = resp.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.SC_OK) {
+            logger.log(Level.WARNING, "response to the request is not OK: skip this IP: status code={0}", statusCode);
+            httpget.abort();
+            ldstTO = new LOCKSSDaemonStatusTableTO();
+            ldstTO.setBoxHttpStatusOK(false);
+            return ldstTO;
+        }
+        entity = resp.getEntity();
+        InputStream is = entity.getContent();
+        ldsthp = new LOCKSSPlatformStatusHtmlParser();
+        ldsthp.getPlatformStatusData(is);
+        ldstTO = ldsthp.getLOCKSSDaemonStatusTableTO();
+        ldstTO.setIpAddress(this.ip);
+        logger.log(Level.FINE, "After parsing {0}: contents of ldstTO:\n{1}", new Object[] { this.tableId, ldstTO });
+        String currenttimeTimestamp = ldstTO.getBoxInfoMap().get("time");
+        logger.log(Level.INFO, "headerTimeString={0} : currenttimeTimestamp={1}", new Object[] { headerTimeString, currenttimeTimestamp });
+        String timezoneOffset = DaemonStatusDataUtil.calculateTimezoneOffset(headerTimeString, currenttimeTimestamp);
+        ldstTO.setTimezoneOffset(timezoneOffset);
+        logger.log(Level.INFO, "timezone offset={0}", ldstTO.getTimezoneOffset());
+    } catch (ConnectTimeoutException ce) {
+        logger.log(Level.WARNING, "ConnectTimeoutException occurred", ce);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } catch (SocketTimeoutException se) {
+        logger.log(Level.WARNING, "SocketTimeoutException occurred", se);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } catch (ConnectException ce) {
+        logger.log(Level.SEVERE, "connection to this box is refused:{0}", this.ip);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        return ldstTO;
+    } catch (ClientProtocolException pe) {
+        logger.log(Level.SEVERE, "The protocol was not http; https is suspected", pe);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        ldstTO.setHttpProtocol(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } catch (IOException ex) {
+        logger.log(Level.SEVERE, "IO exception occurs", ex);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } finally {
+        if (entity != null) {
+            try {
+                EntityUtils.consume(entity);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "io exception when entity was to be" + "consumed", ex);
+            }
+        }
+    }
+    return ldstTO;
+}
+----------------------------
+parsed token num: 335, total token num: 335, pretty line num: 98, other token(common, keyword, const): (290, 45, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1170415.java", 202, 299 */
+public LOCKSSDaemonStatusTableTO getDataFromDaemonStatusTableByHttps() throws HttpResponseException {
+    LOCKSSPlatformStatusReader ldstxp = null;
+    LOCKSSPlatformStatusHtmlParser ldsthp = null;
+    LOCKSSDaemonStatusTableTO ldstTO = null;
+    HttpEntity entity = null;
+    HttpGet httpget = null;
+    String headerTimeString = null;
+    try {
+        httpClient.getParams().setParameter("http.connection.timeout", 100000);
+        httpClient.getParams().setParameter("http.socket.timeout", 100000);
+        httpget = new HttpGet(dataUrl);
+        logger.log(Level.INFO, "executing request {0}", httpget.getURI());
+        HttpResponse resp = httpClient.execute(httpget);
+        HeaderElementIterator it = new BasicHeaderElementIterator(resp.headerIterator());
+        while (it.hasNext()) {
+            HeaderElement elem = it.nextElement();
+            logger.log(Level.INFO, "name({0})=value({1})", new Object[] { elem.getName(), elem.getValue() });
+            if (elem.getName().endsWith("GMT")) {
+                headerTimeString = elem.getName();
+            }
+            NameValuePair[] params = elem.getParameters();
+            for (int i = 0; i < params.length; i++) {
+                logger.log(Level.FINE, "parampair:name = {0}", params[i].getName());
+            }
+        }
+        logger.log(Level.INFO, "headerTimeString={0}", headerTimeString);
+        int statusCode = resp.getStatusLine().getStatusCode();
+        if (statusCode != HttpStatus.SC_OK) {
+            logger.log(Level.WARNING, "response to the request is not OK: skip this IP: status code={0}", statusCode);
+            httpget.abort();
+            ldstTO = new LOCKSSDaemonStatusTableTO();
+            ldstTO.setBoxHttpStatusOK(false);
+            return ldstTO;
+        }
+        entity = resp.getEntity();
+        InputStream is = entity.getContent();
+        ldsthp = new LOCKSSPlatformStatusHtmlParser();
+        ldsthp.getPlatformStatusData(is);
+        ldstTO = ldsthp.getLOCKSSDaemonStatusTableTO();
+        ldstTO.setHostname(this.ip);
+        logger.log(Level.FINE, "After parsing {0}: contents of ldstTO:\n{1}", new Object[] { this.tableId, ldstTO });
+        String currenttimeTimestamp = ldstTO.getBoxInfoMap().get("time");
+        logger.log(Level.INFO, "headerTimeString={0} : currenttimeTimestamp={1}", new Object[] { headerTimeString, currenttimeTimestamp });
+        String timezoneOffset = DaemonStatusDataUtil.calculateTimezoneOffset(headerTimeString, currenttimeTimestamp);
+        ldstTO.setTimezoneOffset(timezoneOffset);
+        logger.log(Level.INFO, "timezone offset={0}", ldstTO.getTimezoneOffset());
+    } catch (ConnectTimeoutException ce) {
+        logger.log(Level.WARNING, "ConnectTimeoutException occurred", ce);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } catch (SocketTimeoutException se) {
+        logger.log(Level.WARNING, "SocketTimeoutException occurred", se);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } catch (ConnectException ce) {
+        logger.log(Level.SEVERE, "connection to this box is refused:{0}", this.ip);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        return ldstTO;
+    } catch (ClientProtocolException pe) {
+        logger.log(Level.SEVERE, "The protocol was not http; https is suspected", pe);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        ldstTO.setHttpProtocol(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } catch (IOException ex) {
+        logger.log(Level.SEVERE, "IO exception occurs", ex);
+        ldstTO = new LOCKSSDaemonStatusTableTO();
+        ldstTO.setBoxHttpStatusOK(false);
+        if (httpget != null) {
+            httpget.abort();
+        }
+        return ldstTO;
+    } finally {
+        if (entity != null) {
+            try {
+                EntityUtils.consume(entity);
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "io exception when entity was to be" + "consumed", ex);
+            }
+        }
+    }
+    return ldstTO;
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2649076.java", 19, 28
+"/workspaces/CCStokener/ccstokener/tokens-verify/2649076.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2649076.java", 30, 39
+"/workspaces/CCStokener/ccstokener/tokens-verify/2649076.out"
+parsed token num: 38, total token num: 38, pretty line num: 10, other token(common, keyword, const): (35, 3, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2649076.java", 19, 28 */
+public static String getCoordinates(String city) throws MalformedURLException, IOException, ParserConfigurationException, SAXException {
+    String url = "http://ws.geonames.org/search?q=" + city + "&maxRows=1&lang=it&username=lorenzo.abram";
+    URLConnection conn = new URL(url).openConnection();
+    InputStream response = conn.getInputStream();
+    GeonamesHandler handler = new GeonamesHandler();
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParser parser = factory.newSAXParser();
+    parser.parse(response, handler);
+    return handler.getCoord();
+}
+----------------------------
+parsed token num: 38, total token num: 38, pretty line num: 10, other token(common, keyword, const): (35, 3, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2649076.java", 30, 39 */
+public static String getWikiPage(String city) throws MalformedURLException, IOException, ParserConfigurationException, SAXException {
+    String url = "http://api.geonames.org/wikipediaSearch?q=" + city + "&maxRows=1&lang=it&username=lorenzo.abram";
+    URLConnection conn = new URL(url).openConnection();
+    InputStream response = conn.getInputStream();
+    GeonamesHandler handler = new GeonamesHandler();
+    SAXParserFactory factory = SAXParserFactory.newInstance();
+    SAXParser parser = factory.newSAXParser();
+    parser.parse(response, handler);
+    return handler.getUrl();
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2148476.java", 22, 48
+"/workspaces/CCStokener/ccstokener/tokens-verify/2148476.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2148476.java", 55, 81
+"/workspaces/CCStokener/ccstokener/tokens-verify/2148476.out"
+parsed token num: 74, total token num: 74, pretty line num: 27, other token(common, keyword, const): (64, 10, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2148476.java", 22, 48 */
+public String getHtmlCode(String urlString) {
+    StringBuffer result = new StringBuffer();
+    BufferedReader in = null;
+    try {
+        URL url = new URL((urlString));
+        URLConnection con = url.openConnection();
+        in = new BufferedReader(new InputStreamReader(con.getInputStream(), "ISO-8859-1"));
+        String line = null;
+        while ((line = in.readLine()) != null) {
+            result.append(line + "\r\n");
+        }
+        in.close();
+    } catch (MalformedURLException e) {
+        System.out.println("Unable to connect to URL: " + urlString);
+    } catch (IOException e) {
+        System.out.println("IOException when connecting to URL: " + urlString);
+    } finally {
+        if (in != null) {
+            try {
+                in.close();
+            } catch (Exception ex) {
+                System.out.println("Exception throws at finally close reader when connecting to URL: " + urlString);
+            }
+        }
+    }
+    return result.toString();
+}
+----------------------------
+parsed token num: 73, total token num: 73, pretty line num: 27, other token(common, keyword, const): (64, 9, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/2148476.java", 55, 81 */
+public String getHtmlCodeUnCharset(String urlString) {
+    StringBuffer result = new StringBuffer();
+    BufferedReader in = null;
+    try {
+        URL url = new URL((urlString));
+        URLConnection con = url.openConnection();
+        in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String line = null;
+        while ((line = in.readLine()) != null) {
+            result.append(line + "\r\n");
+        }
+        in.close();
+    } catch (MalformedURLException e) {
+        System.out.println("Unable to connect to URL: " + urlString);
+    } catch (IOException e) {
+        System.out.println("IOException when connecting to URL: " + urlString);
+    } finally {
+        if (in != null) {
+            try {
+                in.close();
+            } catch (Exception ex) {
+                System.out.println("Exception throws at finally close reader when connecting to URL: " + urlString);
+            }
+        }
+    }
+    return result.toString();
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/727008.java", 33, 72
+"/workspaces/CCStokener/ccstokener/tokens-verify/727008.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/727008.java", 87, 126
+"/workspaces/CCStokener/ccstokener/tokens-verify/727008.out"
+parsed token num: 116, total token num: 116, pretty line num: 40, other token(common, keyword, const): (99, 17, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/727008.java", 33, 72 */
+public void upload(String ftpServer, String user, String password, String fileName, File source) throws MalformedURLException, IOException {
+    if (ftpServer != null && fileName != null && source != null) {
+        StringBuffer sb = new StringBuffer("ftp://");
+        if (user != null && password != null) {
+            sb.append(user);
+            sb.append(':');
+            sb.append(password);
+            sb.append('@');
+        }
+        sb.append(ftpServer);
+        sb.append('/');
+        sb.append(fileName);
+        sb.append(";type=i");
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        try {
+            URL url = new URL(sb.toString());
+            URLConnection urlc = url.openConnection();
+            bos = new BufferedOutputStream(urlc.getOutputStream());
+            bis = new BufferedInputStream(new FileInputStream(source));
+            int i;
+            while ((i = bis.read()) != -1) {
+                bos.write(i);
+            }
+        } finally {
+            if (bis != null) try {
+                bis.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+            if (bos != null) try {
+                bos.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+    } else {
+        System.out.println("Input not available.");
+    }
+}
+----------------------------
+parsed token num: 116, total token num: 116, pretty line num: 40, other token(common, keyword, const): (99, 17, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/727008.java", 87, 126 */
+public void download(String ftpServer, String user, String password, String fileName, File destination) throws MalformedURLException, IOException {
+    if (ftpServer != null && fileName != null && destination != null) {
+        StringBuffer sb = new StringBuffer("ftp://");
+        if (user != null && password != null) {
+            sb.append(user);
+            sb.append(':');
+            sb.append(password);
+            sb.append('@');
+        }
+        sb.append(ftpServer);
+        sb.append('/');
+        sb.append(fileName);
+        sb.append(";type=i");
+        BufferedInputStream bis = null;
+        BufferedOutputStream bos = null;
+        try {
+            URL url = new URL(sb.toString());
+            URLConnection urlc = url.openConnection();
+            bis = new BufferedInputStream(urlc.getInputStream());
+            bos = new BufferedOutputStream(new FileOutputStream(destination));
+            int i;
+            while ((i = bis.read()) != -1) {
+                bos.write(i);
+            }
+        } finally {
+            if (bis != null) try {
+                bis.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+            if (bos != null) try {
+                bos.close();
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        }
+    } else {
+        System.out.println("Input not available");
+    }
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1290175.java", 17, 24
+"/workspaces/CCStokener/ccstokener/tokens-verify/1290175.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1290175.java", 26, 33
+"/workspaces/CCStokener/ccstokener/tokens-verify/1290175.out"
+parsed token num: 17, total token num: 17, pretty line num: 8, other token(common, keyword, const): (16, 1, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1290175.java", 17, 24 */
+public URL convertToFileURL(URL url) throws IOException {
+    URLConnection connection = url.openConnection();
+    if (connection instanceof BundleURLConnection) {
+        return ((BundleURLConnection) connection).getFileURL();
+    } else {
+        return url;
+    }
+}
+----------------------------
+parsed token num: 17, total token num: 17, pretty line num: 8, other token(common, keyword, const): (16, 1, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1290175.java", 26, 33 */
+public URL convertToLocalURL(URL url) throws IOException {
+    URLConnection connection = url.openConnection();
+    if (connection instanceof BundleURLConnection) {
+        return ((BundleURLConnection) connection).getLocalURL();
+    } else {
+        return url;
+    }
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/743224.java", 33, 63
+"/workspaces/CCStokener/ccstokener/tokens-verify/743224.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/743224.java", 65, 95
+"/workspaces/CCStokener/ccstokener/tokens-verify/743224.out"
+parsed token num: 134, total token num: 134, pretty line num: 31, other token(common, keyword, const): (77, 57, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/743224.java", 33, 63 */
+public void sendPOIGpxLocation() {
+    this.myloc = new Position(45.56, 5.9);
+    this.left = myloc.getY() - 0.025;
+    this.right = myloc.getY() + 0.025;
+    this.top = myloc.getX() + 0.03;
+    this.bottom = myloc.getX() - 0.03;
+    assertEquals("left test", left, (5.9 - 0.025));
+    assertEquals("right test", right, (5.9 + 0.025));
+    assertEquals("top test", top, (45.56 - 0.025));
+    assertEquals("bottom test", left, (45.56 + 0.025));
+    this.poisCheck.add("amenity");
+    try {
+        if (this.poisCheck.get(0).compareTo("None") == 0) {
+            model.setPointsOfInterest(new Items());
+        } else {
+            this.url = new URL("http://www.informationfreeway.org/api/0.6/node[" + poisCheck.get(0) + "=*][bbox=" + left + "," + bottom + "," + right + "," + top + "]");
+            assertEquals("url informationfreeway.org test", url, "http://www.informationfreeway.org/api/0.6/node[amenity=*]" + "[bbox=" + left + "," + bottom + "," + right + "," + top + "]");
+            SAXParser pars = null;
+            ParsePoiGpx gpxHandler = new ParsePoiGpx(poisCheck, this.model.getContext());
+            pars = SAXParserFactory.newInstance().newSAXParser();
+            pars.getXMLReader().setFeature("http://xml.org/sax/features/namespaces", true);
+            pars.parse(url.openStream(), gpxHandler);
+            this.pois = gpxHandler.getPOIResultsItems();
+            assertTrue("there is some pois", !this.pois.equals(0));
+            assertFalse("there is some pois", this.pois.equals(0));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        assertFalse(!e.getCause().equals(null));
+    }
+}
+----------------------------
+parsed token num: 134, total token num: 134, pretty line num: 31, other token(common, keyword, const): (77, 57, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/743224.java", 65, 95 */
+public void sendPOIGpxNonePOIs() {
+    this.myloc = new Position(45.56, 5.9);
+    this.left = myloc.getY() - 0.025;
+    this.right = myloc.getY() + 0.025;
+    this.top = myloc.getX() + 0.03;
+    this.bottom = myloc.getX() - 0.03;
+    assertEquals("left test", left, (5.9 - 0.025));
+    assertEquals("right test", right, (5.9 + 0.025));
+    assertEquals("top test", top, (45.56 - 0.025));
+    assertEquals("bottom test", left, (45.56 + 0.025));
+    this.poisCheck.add("None");
+    try {
+        if (this.poisCheck.get(0).compareTo("None") == 0) {
+            model.setPointsOfInterest(new Items());
+        } else {
+            this.url = new URL("http://www.informationfreeway.org/api/0.6/node[" + poisCheck.get(0) + "=*][bbox=" + left + "," + bottom + "," + right + "," + top + "]");
+            assertEquals("url informationfreeway.org test", url, "http://www.informationfreeway.org/api/0.6/node[amenity=*]" + "[bbox=" + left + "," + bottom + "," + right + "," + top + "]");
+            SAXParser pars = null;
+            ParsePoiGpx gpxHandler = new ParsePoiGpx(poisCheck, this.model.getContext());
+            pars = SAXParserFactory.newInstance().newSAXParser();
+            pars.getXMLReader().setFeature("http://xml.org/sax/features/namespaces", true);
+            pars.parse(url.openStream(), gpxHandler);
+            this.pois = gpxHandler.getPOIResultsItems();
+            assertFalse("there is some pois", !this.pois.equals(0));
+            assertTrue("there is some pois", this.pois.equals(0));
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+        assertFalse(!e.getCause().equals(null));
+    }
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/801251.java", 19, 25
+"/workspaces/CCStokener/ccstokener/tokens-verify/801251.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/801251.java", 27, 33
+"/workspaces/CCStokener/ccstokener/tokens-verify/801251.out"
+parsed token num: 24, total token num: 24, pretty line num: 7, other token(common, keyword, const): (23, 1, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/801251.java", 19, 25 */
+public List<Professor> getProfessores(InputStream is) throws IOException, SAXException {
+    ListaProfessoresSAXHandler handler = new ListaProfessoresSAXHandler();
+    parser.setContentHandler(handler);
+    InputSource input = new InputSource(is);
+    parser.parse(input);
+    return handler.getLista();
+}
+----------------------------
+parsed token num: 24, total token num: 24, pretty line num: 7, other token(common, keyword, const): (23, 1, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/801251.java", 27, 33 */
+public List<Publicacao> lerPublicacoes(InputStream is) throws IOException, SAXException {
+    CurriculumCapesSAXHandler handler = new CurriculumCapesSAXHandler();
+    parser.setContentHandler(handler);
+    InputSource input = new InputSource(is);
+    parser.parse(input);
+    return handler.getPublicacoes();
+}
+
+
+
+sim: 1.00
+token sim: -1.00, line sim: -1.00
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1545738.java", 24, 37
+"/workspaces/CCStokener/ccstokener/tokens-verify/1545738.out"
+"/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1545738.java", 39, 52
+"/workspaces/CCStokener/ccstokener/tokens-verify/1545738.out"
+parsed token num: 49, total token num: 49, pretty line num: 14, other token(common, keyword, const): (44, 5, 0)
+----------------------------
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1545738.java", 24, 37 */
+public static TopArtistsLastFMContainer getTopArtistsFromLastFM() {
+    TopArtistsLastFMContainer artistsContainerLastFM = null;
+    try {
+        URL url = new URL(URL_LAST_FM + "?method=" + METHODE_CHART_GETTOPARTISTS + "&format=" + FORMAT_JSON + "&api_key=" + API_KEY_LAST_FM);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String line = reader.readLine();
+        Gson gson = new Gson();
+        artistsContainerLastFM = gson.fromJson(line, TopArtistsLastFMContainer.class);
+        reader.close();
+    } catch (MalformedURLException e) {
+    } catch (IOException e) {
+    }
+    return artistsContainerLastFM;
+}
+----------------------------
+parsed token num: 49, total token num: 49, pretty line num: 14, other token(common, keyword, const): (44, 5, 0)
+/* "/workspaces/CCStokener/ccstokener/datasets/ijadataset/bcb_reduced/bcb_reduced/2/selected/1545738.java", 39, 52 */
+public static TopTracksLastFMContainer getTopTracksFromLastFM() {
+    TopTracksLastFMContainer tracksContainerLastFM = null;
+    try {
+        URL url = new URL(URL_LAST_FM + "?method=" + METHODE_CHART_GETTOPTRACKS + "&format=" + FORMAT_JSON + "&api_key=" + API_KEY_LAST_FM);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
+        String line = reader.readLine();
+        Gson gson = new Gson();
+        tracksContainerLastFM = gson.fromJson(line, TopTracksLastFMContainer.class);
+        reader.close();
+    } catch (MalformedURLException e) {
+    } catch (IOException e) {
+    }
+    return tracksContainerLastFM;
+}
+
+
+
