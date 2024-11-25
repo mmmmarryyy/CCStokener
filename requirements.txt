@@ -1,0 +1,5 @@
+javalang==0.13.0
+numpy==1.21.2
+pandarallel==1.6.5
+pandas==2.0.1
+six==1.16.0
