@@ -50,7 +50,7 @@ class Method(Token):
 
 class Qualifier(Token):
     def __init__(self, name):
-        super().__init__(name, None, None)
+        super().__init__(name, RoleType.QUALIFIER, None)
 
 
 class Keyword(Token):

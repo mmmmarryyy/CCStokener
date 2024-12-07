@@ -2,21 +2,18 @@ import codecs
 import os
 import shutil
 import sys
-
-import pandas as pd
-from pandarallel import pandarallel
+from multiprocessing import Pool, cpu_count
 
 from file_utils import utils
-from file_utils.json_file_utils import finalize_json
 from logger import log
-from semantic_tokens import my_javalang
+from semantic_tokens import javalang
 from semantic_tokens.token_parser.token_parser import TokenParser
 
-pandarallel.initialize()
 sys.setrecursionlimit(50000)
 
 
-def parse_file(file_path, output_file_path):
+def parse_file(args):
+    file_path, output_file_path = args
     file_path = os.path.abspath(file_path)
     utils.remove_file_if_exists(output_file_path)
 
@@ -26,8 +23,8 @@ def parse_file(file_path, output_file_path):
         with codecs.open(file_path, 'r', encoding='utf-8', errors='ignore') as file:
             file_content = file.read()
 
-        tokens = my_javalang.tokenizer.tokenize(file_content)
-        parser = my_javalang.parser.Parser(tokens)
+        tokens = javalang.tokenizer.tokenize(file_content)
+        parser = javalang.parser.Parser(tokens)
         tree = parser.parse()
     except Exception as e:
         log.warning('exception when parse file: {}, msg: {}'.format(file_path, e))
@@ -36,7 +33,6 @@ def parse_file(file_path, output_file_path):
     try:
         token_parser = TokenParser()
         token_parser.parse(tree, file_path=file_path, output_file_path=output_file_path)
-        finalize_json(output_file_path)
     except Exception as e:
         log.warning('exception when parse tokens: {}, msg: {}'.format(file_path, e))
 
@@ -57,14 +53,14 @@ def parse_directory(input_directory, output_directory):
         pure_name = utils.get_pure_name(src_file)
         if pure_name not in output_file_counter:
             output_file_counter[pure_name] = 1
-            output_file_list.append(os.path.join(output_directory, pure_name + '.json'))
+            output_file_list.append((src_file, os.path.join(output_directory, pure_name + '.out')))
         else:
             output_file_counter[pure_name] += 1
-            output_file_list.append(
-                os.path.join(output_directory, pure_name + '__' + str(output_file_counter[pure_name]) + '.json'))
+            output_file_list.append((src_file, os.path.join(output_directory, pure_name + '__' + str(
+                output_file_counter[pure_name]) + '.out')))
 
-    file_pd = pd.DataFrame({'file_list': file_list, 'output_file_list': output_file_list})
-    file_pd.parallel_apply(lambda x: parse_file(x['file_list'], x['output_file_list']), axis=1)
+    with Pool(processes=cpu_count()) as pool:
+        pool.map(parse_file, output_file_list)
 
 
 def parse_directories(input_directory, output_directory):

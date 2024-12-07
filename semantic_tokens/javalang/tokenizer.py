@@ -7,7 +7,6 @@ import six
 class LexerError(Exception):
     pass
 
-
 class JavaToken(object):
     def __init__(self, value, position=None, javadoc=None):
         self.value = value
@@ -18,7 +17,7 @@ class JavaToken(object):
         if self.position:
             return '%s "%s" line %d, position %d' % (
                 self.__class__.__name__, self.value, self.position[0], self.position[1]
-            )
+                )
         else:
             return '%s "%s"' % (self.__class__.__name__, self.value)
 
@@ -28,10 +27,8 @@ class JavaToken(object):
     def __eq__(self, other):
         raise Exception("Direct comparison not allowed")
 
-
 class EndOfInput(JavaToken):
     pass
-
 
 class Keyword(JavaToken):
     VALUES = set(['abstract', 'assert', 'boolean', 'break', 'byte', 'case',
@@ -50,71 +47,55 @@ class Modifier(Keyword):
                   'protected', 'public', 'static', 'strictfp', 'synchronized',
                   'transient', 'volatile'])
 
-
 class BasicType(Keyword):
     VALUES = set(['boolean', 'byte', 'char', 'double',
                   'float', 'int', 'long', 'short'])
 
-
 class Literal(JavaToken):
     pass
-
 
 class Integer(Literal):
     pass
 
-
 class DecimalInteger(Literal):
     pass
-
 
 class OctalInteger(Integer):
     pass
 
-
 class BinaryInteger(Integer):
     pass
-
 
 class HexInteger(Integer):
     pass
 
-
 class FloatingPoint(Literal):
     pass
-
 
 class DecimalFloatingPoint(FloatingPoint):
     pass
 
-
 class HexFloatingPoint(FloatingPoint):
     pass
-
 
 class Boolean(Literal):
     VALUES = set(["true", "false"])
 
-
 class Character(Literal):
     pass
-
 
 class String(Literal):
     pass
 
-
 class Null(Literal):
     pass
-
 
 class Separator(JavaToken):
     VALUES = set(['(', ')', '{', '}', '[', ']', ';', ',', '.'])
 
-
 class Operator(JavaToken):
     MAX_LEN = 4
-    VALUES = set(['>>>=', '>>=', '<<=', '%=', '^=', '|=', '&=', '/=',
+    VALUES = set(['>>>=', '>>=', '<<=',  '%=', '^=', '|=', '&=', '/=',
                   '*=', '-=', '+=', '<<', '--', '++', '||', '&&', '!=',
                   '>=', '<=', '==', '%', '^', '|', '&', '/', '*', '-',
                   '+', ':', '?', '~', '!', '<', '>', '=', '...', '->', '::'])
@@ -137,7 +118,7 @@ class Operator(JavaToken):
 
     LAMBDA = set(['->'])
 
-    METHOD_REFERENCE = set(['::', ])
+    METHOD_REFERENCE = set(['::',])
 
     def is_infix(self):
         return self.value in self.INFIX
@@ -155,12 +136,12 @@ class Operator(JavaToken):
 class Annotation(JavaToken):
     pass
 
-
 class Identifier(JavaToken):
     pass
 
 
 class JavaTokenizer(object):
+
     IDENT_START_CATEGORIES = set(['Lu', 'Ll', 'Lt', 'Lm', 'Lo', 'Nl', 'Pc', 'Sc'])
 
     IDENT_PART_CATEGORIES = set(['Lu', 'Ll', 'Lt', 'Lm', 'Lo', 'Mc', 'Mn', 'Nd', 'Nl', 'Pc', 'Sc'])
@@ -179,6 +160,7 @@ class JavaTokenizer(object):
         self.whitespace_consumer = re.compile(r'[^\s]')
 
         self.javadoc = None
+
 
     def reset(self):
         self.i = 0
@@ -463,8 +445,8 @@ class JavaTokenizer(object):
         j = 0
         length = len(data)
 
-        NONE = 0
-        ELIGIBLE = 1
+        NONE         = 0
+        ELIGIBLE     = 1
         MARKER_FOUND = 2
 
         state = NONE
@@ -493,9 +475,9 @@ class JavaTokenizer(object):
 
                 if c != 'u':
                     try:
-                        escape_code = int(data[j:j + 4], 16)
+                        escape_code = int(data[j:j+4], 16)
                     except ValueError:
-                        self.error('Invalid unicode escape', data[j:j + 4])
+                        self.error('Invalid unicode escape', data[j:j+4])
 
                     new_data.append(six.unichr(escape_code))
 
@@ -599,11 +581,9 @@ class JavaTokenizer(object):
 
         raise LexerError(message)
 
-
 def tokenize(code):
     tokenizer = JavaTokenizer(code)
     return tokenizer.tokenize()
-
 
 def reformat_tokens(tokens):
     indent = 0

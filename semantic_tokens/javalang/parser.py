@@ -1,13 +1,13 @@
 import six
-from javalang import tree
-from javalang import util
 
+from . import util
+from . import tree
 from .tokenizer import (
-    EndOfInput, Modifier, BasicType, Identifier,
-    Annotation, Literal, Operator, )
+    EndOfInput, Keyword, Modifier, BasicType, Identifier,
+    Annotation, Literal, Operator, JavaToken,
+    )
 
 ENABLE_DEBUG_SUPPORT = False
-
 
 def parse_debug(method):
     global ENABLE_DEBUG_SUPPORT
@@ -43,7 +43,7 @@ def parse_debug(method):
                 finally:
                     token = six.text_type(self.tokens.last())
                     print("%s <%s %s(%s, %s) %s" %
-                          (depth, sep, name, start_value, token, e_message))
+                        (depth, sep, name, start_value, token, e_message))
                     self.recursion_depth -= 1
             else:
                 self.recursion_depth += 1
@@ -59,14 +59,12 @@ def parse_debug(method):
     else:
         return method
 
-
 # ------------------------------------------------------------------------------
 # ---- Parsing exception ----
 
 class JavaParserBaseException(Exception):
     def __init__(self, message=''):
         super(JavaParserBaseException, self).__init__(message)
-
 
 class JavaSyntaxError(JavaParserBaseException):
     def __init__(self, description, at=None):
@@ -75,25 +73,23 @@ class JavaSyntaxError(JavaParserBaseException):
         self.description = description
         self.at = at
 
-
 class JavaParserError(JavaParserBaseException):
     pass
-
 
 # ------------------------------------------------------------------------------
 # ---- Parser class ----
 
 class Parser(object):
-    operator_precedence = [set(('||',)),
-                           set(('&&',)),
-                           set(('|',)),
-                           set(('^',)),
-                           set(('&',)),
-                           set(('==', '!=')),
-                           set(('<', '>', '>=', '<=', 'instanceof')),
-                           set(('<<', '>>', '>>>')),
-                           set(('+', '-')),
-                           set(('*', '/', '%'))]
+    operator_precedence = [ set(('||',)),
+                            set(('&&',)),
+                            set(('|',)),
+                            set(('^',)),
+                            set(('&',)),
+                            set(('==', '!=')),
+                            set(('<', '>', '>=', '<=', 'instanceof')),
+                            set(('<<', '>>', '>>>')),
+                            set(('+', '-')),
+                            set(('*', '/', '%')) ]
 
     def __init__(self, tokens):
         self.tokens = util.LookAheadListIterator(tokens)
@@ -101,21 +97,20 @@ class Parser(object):
 
         self.debug = False
         self.end_position = None
-
-    # ------------------------------------------------------------------------------
-    # ---- Debug control ----
+# ------------------------------------------------------------------------------
+# ---- Debug control ----
 
     def set_debug(self, debug=True):
         self.debug = debug
 
-    # ------------------------------------------------------------------------------
-    # ---- Parsing entry point ----
+# ------------------------------------------------------------------------------
+# ---- Parsing entry point ----
 
     def parse(self):
         return self.parse_compilation_unit()
 
-    # ------------------------------------------------------------------------------
-    # ---- Helper methods ----
+# ------------------------------------------------------------------------------
+# ---- Helper methods ----
 
     def illegal(self, description, at=None):
         if not at:
@@ -226,11 +221,11 @@ class Parser(object):
         return (isinstance(self.tokens.look(i), Annotation)
                 and self.tokens.look(i + 1).value == 'interface')
 
-    # ------------------------------------------------------------------------------
-    # ---- Parsing methods ----
+# ------------------------------------------------------------------------------
+# ---- Parsing methods ----
 
-    # ------------------------------------------------------------------------------
-    # -- Identifiers --
+# ------------------------------------------------------------------------------
+# -- Identifiers --
 
     @parse_debug
     def parse_identifier(self):
@@ -262,8 +257,8 @@ class Parser(object):
 
         return qualified_identifiers
 
-    # ------------------------------------------------------------------------------
-    # -- Top level units --
+# ------------------------------------------------------------------------------
+# -- Top level units --
 
     @parse_debug
     def parse_compilation_unit(self):
@@ -283,14 +278,14 @@ class Parser(object):
 
         if self.try_accept('package'):
             self.tokens.pop_marker(False)
-
+            
             token = self.tokens.look()
             package_name = self.parse_qualified_identifier()
             package = tree.PackageDeclaration(annotations=package_annotations,
                                               name=package_name,
                                               documentation=javadoc)
             package._position = token.position
-
+            
             self.accept(';')
         else:
             self.tokens.pop_marker(True)
@@ -372,6 +367,7 @@ class Parser(object):
         type_declaration.modifiers = modifiers
         type_declaration.annotations = annotations
         type_declaration.documentation = javadoc
+
 
         return type_declaration
 
@@ -458,8 +454,8 @@ class Parser(object):
         return tree.AnnotationDeclaration(name=name,
                                           body=body)
 
-    # ------------------------------------------------------------------------------
-    # -- Types --
+# ------------------------------------------------------------------------------
+# -- Types --
 
     @parse_debug
     def parse_type(self):
@@ -627,8 +623,8 @@ class Parser(object):
 
         return [None] * array_dimension
 
-    # ------------------------------------------------------------------------------
-    # -- Annotations and modifiers --
+# ------------------------------------------------------------------------------
+# -- Annotations and modifiers --
 
     @parse_debug
     def parse_modifiers(self):
@@ -661,7 +657,7 @@ class Parser(object):
 
         while True:
             token = self.tokens.look()
-
+            
             annotation = self.parse_annotation()
             annotation._position = token.position
             annotations.append(annotation)
@@ -760,8 +756,8 @@ class Parser(object):
 
         return element_values
 
-    # ------------------------------------------------------------------------------
-    # -- Class body --
+# ------------------------------------------------------------------------------
+# -- Class body --
 
     @parse_debug
     def parse_class_body(self):
@@ -857,7 +853,7 @@ class Parser(object):
     @parse_debug
     def parse_method_or_field_rest(self):
         token = self.tokens.look()
-
+        
         if self.would_accept('('):
             return self.parse_method_declarator_rest()
         else:
@@ -893,9 +889,9 @@ class Parser(object):
             self.accept(';')
 
         method = tree.MethodDeclaration(parameters=formal_parameters,
-                                        throws=throws,
-                                        body=body,
-                                        return_type=tree.Type(dimensions=additional_dimensions))
+                                     throws=throws,
+                                     body=body,
+                                     return_type=tree.Type(dimensions=additional_dimensions))
         method.end_position = self.end_position
         return method
 
@@ -914,8 +910,8 @@ class Parser(object):
             self.accept(';')
 
         method = tree.MethodDeclaration(parameters=formal_parameters,
-                                        throws=throws,
-                                        body=body)
+                                      throws=throws,
+                                      body=body)
         method.end_position = self.end_position
 
         return method
@@ -932,11 +928,11 @@ class Parser(object):
         body = self.parse_block()
 
         constructor = tree.ConstructorDeclaration(parameters=formal_parameters,
-                                                  throws=throws,
-                                                  body=body)
+                                           throws=throws,
+                                           body=body)
         constructor.end_position = self.end_position
 
-        return constructor
+        return constructor 
 
     @parse_debug
     def parse_generic_method_or_constructor_declaration(self):
@@ -967,8 +963,8 @@ class Parser(object):
         method.type_parameters = type_parameters
         return method
 
-    # ------------------------------------------------------------------------------
-    # -- Interface body --
+# ------------------------------------------------------------------------------
+# -- Interface body --
 
     @parse_debug
     def parse_interface_body(self):
@@ -1021,7 +1017,7 @@ class Parser(object):
             declaration = self.parse_interface_method_or_field_declaration()
 
         declaration._position = token.position
-
+        
         return declaration
 
     @parse_debug
@@ -1097,9 +1093,9 @@ class Parser(object):
             self.accept(';')
 
         method = tree.MethodDeclaration(parameters=parameters,
-                                        throws=throws,
-                                        body=body,
-                                        return_type=tree.Type(dimensions=array_dimension))
+                                      throws=throws,
+                                      body=body,
+                                      return_type=tree.Type(dimensions=array_dimension))
         method.end_position = self.end_position
         return method
 
@@ -1118,8 +1114,8 @@ class Parser(object):
             self.accept(';')
 
         method = tree.MethodDeclaration(parameters=parameters,
-                                        throws=throws,
-                                        body=body)
+                                      throws=throws,
+                                      body=body)
         method.end_position = self.end_position
         return method
 
@@ -1140,8 +1136,8 @@ class Parser(object):
 
         return method
 
-    # ------------------------------------------------------------------------------
-    # -- Parameters and variables --
+# ------------------------------------------------------------------------------
+# -- Parameters and variables --
 
     @parse_debug
     def parse_formal_parameters(self):
@@ -1154,7 +1150,7 @@ class Parser(object):
 
         while True:
             modifiers, annotations = self.parse_variable_modifiers()
-
+            
             token = self.tokens.look()
             parameter_type = self.parse_type()
             varargs = False
@@ -1278,8 +1274,8 @@ class Parser(object):
             if self.try_accept('}'):
                 return array_initializer
 
-    # ------------------------------------------------------------------------------
-    # -- Blocks and statements --
+# ------------------------------------------------------------------------------
+# -- Blocks and statements --
 
     @parse_debug
     def parse_block(self):
@@ -1294,6 +1290,7 @@ class Parser(object):
         # record end block position
         token = self.tokens.look()
         self.end_position = token.position
+        # print('parse block end position: {}'.format(self.end_position))
 
         self.accept('}')
 
@@ -1544,8 +1541,8 @@ class Parser(object):
 
             return tree.StatementExpression(expression=expression)
 
-    # ------------------------------------------------------------------------------
-    # -- Try / catch --
+# ------------------------------------------------------------------------------
+# -- Try / catch --
 
     @parse_debug
     def parse_catches(self):
@@ -1615,8 +1612,8 @@ class Parser(object):
                                 name=name,
                                 value=value)
 
-    # ------------------------------------------------------------------------------
-    # -- Switch and for statements ---
+# ------------------------------------------------------------------------------
+# -- Switch and for statements ---
 
     @parse_debug
     def parse_switch_block_statement_groups(self):
@@ -1766,8 +1763,8 @@ class Parser(object):
 
         return expressions
 
-    # ------------------------------------------------------------------------------
-    # -- Expressions --
+# ------------------------------------------------------------------------------
+# -- Expressions --
 
     @parse_debug
     def parse_expression(self):
@@ -1839,8 +1836,8 @@ class Parser(object):
 
         return parts
 
-    # ------------------------------------------------------------------------------
-    # -- Expression operators --
+# ------------------------------------------------------------------------------
+# -- Expression operators --
 
     @parse_debug
     def parse_expression_3(self):
@@ -1851,9 +1848,9 @@ class Parser(object):
         if self.would_accept('('):
             try:
                 with self.tokens:
-                    lambda_exp = self.parse_lambda_expression()
-                    if lambda_exp:
-                        return lambda_exp
+                        lambda_exp = self.parse_lambda_expression()
+                        if lambda_exp:
+                            return lambda_exp
             except JavaSyntaxError:
                 pass
             try:
@@ -1939,8 +1936,8 @@ class Parser(object):
 
         return operator
 
-    # ------------------------------------------------------------------------------
-    # -- Primary expressions --
+# ------------------------------------------------------------------------------
+# -- Primary expressions --
 
     @parse_debug
     def parse_primary(self):
@@ -2092,8 +2089,8 @@ class Parser(object):
             return tree.MethodInvocation(member=identifier,
                                          arguments=arguments)
 
-    # ------------------------------------------------------------------------------
-    # -- Creators --
+# ------------------------------------------------------------------------------
+# -- Creators --
 
     @parse_debug
     def parse_creator(self):
@@ -2219,7 +2216,7 @@ class Parser(object):
         type_arguments = self.parse_nonwildcard_type_arguments()
 
         token = self.tokens.look()
-
+        
         invocation = self.parse_explicit_generic_invocation_suffix()
         invocation._position = token.position
         invocation.type_arguments = type_arguments
@@ -2286,8 +2283,8 @@ class Parser(object):
 
         self.illegal("Expected selector")
 
-    # ------------------------------------------------------------------------------
-    # -- Enum and annotation body --
+# ------------------------------------------------------------------------------
+# -- Enum and annotation body --
 
     @parse_debug
     def parse_enum_body(self):
@@ -2414,7 +2411,6 @@ class Parser(object):
                                          default=default)
         else:
             return self.parse_constant_declarators_rest()
-
 
 def parse(tokens, debug=False):
     parser = Parser(tokens)
