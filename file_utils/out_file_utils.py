@@ -55,9 +55,32 @@ def extract_vectors_from_out(out_block_str, out_block_data):
     return out_block_data
 
 
-def get_common_path(path, pattern):
-    match = re.search(pattern, path)
-    if match:
-        return match.group(0)
-    else:
-        return None
+def extract_action_tokens(out_block_data):
+    """Extracts action tokens from the parsed OUT block data."""
+    action_tokens = list()
+    for section in ["method", "type", "variable"]:
+        for item in out_block_data.get(section, []):
+            action_tokens.append(item["vector"])
+    return sorted(action_tokens)
+
+
+def process_out_file(file_path):
+    """Processes a single .out file, extracting block data."""
+    try:
+        with open(file_path, 'r') as f:
+            out_data = f.read()
+    except FileNotFoundError:
+        print(f"Error: File not found - {file_path}")
+        return {}
+
+    blocks = re.findall(r'<block (.*?)>(.*?)</block>', out_data, re.DOTALL)
+    block_data_all = {}
+    for block_attrs_str, block_content in blocks:
+        block_data = extract_out_block_attributes(block_attrs_str)
+        block_data = extract_vectors_from_out(block_content, block_data)
+        block_id = (block_data['filePath'], block_data['startline'])
+
+        block_data['action_tokens'] = extract_action_tokens(block_data)
+        block_data_all[block_id] = block_data
+    return block_data_all
+

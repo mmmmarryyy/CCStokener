@@ -1,4 +1,5 @@
 import os
+import re
 
 
 def get_list_of_files_with_suffix(dir_path, suffix=''):
@@ -25,3 +26,11 @@ def get_pure_name(file_path):
 def remove_file_if_exists(file_path):
     if os.path.exists(file_path):
         os.remove(file_path)
+
+
+def get_common_path(path, pattern):
+    match = re.search(pattern, path)
+    if match:
+        return match.group(0)
+    else:
+        return None

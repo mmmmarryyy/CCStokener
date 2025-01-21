@@ -6,3 +6,8 @@ To extract tokens run
 ```
 python extract_tokens.py
 ```
+
+To find tokens
+```
+python code_clone_detection.py
+```

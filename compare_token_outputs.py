@@ -1,44 +1,36 @@
-import re
 from collections import Counter
 
-from file_utils.out_file_utils import extract_out_block_attributes, extract_vectors_from_out, get_common_path
-from file_utils.utils import get_list_of_files_with_suffix
+from file_utils.out_file_utils import process_out_file
+from file_utils.utils import get_list_of_files_with_suffix, get_common_path
 
 
 def compare_outs(my_out_file, original_out_file):
     """Compares a JSON file and an OUT file for equivalent data."""
 
     try:
-        with open(my_out_file, 'r') as f:
-            my_out_data = f.read()
+        my_out_data = process_out_file(my_out_file)
     except FileNotFoundError as e:
-        print(f"Error loading my out file {original_out_file}: {e}")
+        print(f"Error loading my out file {my_out_file}: {e}")
         return False
 
     try:
-        with open(original_out_file, 'r') as f:
-            original_out_data = f.read()
+        original_out_data = process_out_file(original_out_file)
     except FileNotFoundError as e:
         print(f"Error loading original out file {original_out_file}: {e}")
         return False
 
-    my_out_blocks = re.findall(r'<block (.*?)>(.*?)</block>', my_out_data, re.DOTALL)
-    original_out_blocks = re.findall(r'<block (.*?)>(.*?)</block>', original_out_data, re.DOTALL)
-
-    if len(my_out_blocks) != len(original_out_blocks):
+    if len(my_out_data) != len(original_out_data):
         print("Number of blocks mismatch.")
         return False
 
-    for i in range(len(my_out_blocks)):
-        original_out_block_attrs_str, original_out_block_content = original_out_blocks[i]
-        original_out_block_data = extract_out_block_attributes(original_out_block_attrs_str)
-        original_out_block_data = extract_vectors_from_out(original_out_block_content, original_out_block_data)
+    my_out_keys = sorted(my_out_data.keys())
+    original_out_keys = sorted(original_out_data.keys())
 
-        my_out_block_attrs_str, my_out_block_content = my_out_blocks[i]
-        my_out_block_data = extract_out_block_attributes(my_out_block_attrs_str)
-        my_out_block_data = extract_vectors_from_out(my_out_block_content, my_out_block_data)
+    for i in range(len(my_out_keys)):
+        my_out_block_key = my_out_keys[i]
+        original_out_block_key = original_out_keys[i]
 
-        if not compare_block(my_out_block_data, original_out_block_data):
+        if not compare_block(my_out_data[my_out_block_key], original_out_data[original_out_block_key]):
             print(f"Block {i + 1} mismatch.")
             return False
 
